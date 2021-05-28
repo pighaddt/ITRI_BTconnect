@@ -5,13 +5,13 @@ from numpy import *
 from pyqtgraph.Qt import QtGui, QtCore
 import pyqtgraph as pg
 import serial
-from PhysioNetData import medianFilter, bandStopFilter
+# from PhysioNetData import medianFilter, bandStopFilter
 from collections import deque
 import csv
 
 
 # Create object serial port
-portName = "COM3"
+portName = "COM6"
 baudRate = 115200
 R = 30
 Y_range = [-2500, 2500]
@@ -33,7 +33,7 @@ Xm = linspace(0, 0, 1000)
 # Xm = linspace(0, 0, 250)         # create array that will contain the relevant time series
 ptr = -windowWidth                       # set first x position
 Value = deque(maxlen=len(Xm))
-saveData = linspace(0, 0, 100000)
+saveData = []
 index = 0
 
 # Realtime data plot.
@@ -58,20 +58,20 @@ def update():
                 value = (value % 10000) -1500
                 Xm[-1] = value             # vector containing the instantaneous values
                 # index = index + 1
-                saveData[index] = value
-                index = index + 1
+                saveData.append(value)
+                index += 1
                 # print(saveData)
                 ptr += 1  # update x position for displaying the curve
                 curve.setData(Xm)  # set the curve with these data
                 # curve.setPos(ptr, 0)  # set x position in the graph to 0
                 QtGui.QApplication.processEvents()  # process the plot now
-
                 if index % 1000 == 0:
-                    with open(r"C:\Users\A80162\Desktop\example.csv", "w", newline="") as csvfile:
+                    with open(r"C:\Users\angus\Desktop\example.csv", "w", newline="") as csvfile:
                         wr = csv.writer(csvfile)
-                        wr.writerow(saveData[1: index])
-
-
+                        print(saveData)
+                        # wr.writerow(saveData[1: index])
+                        for word in range(1, len(saveData)):
+                            wr.writerow([saveData[word]])
 
     # # Filtered signal: Median Filter to solve Baseline Wandering.
     # if value != '\r\n':
