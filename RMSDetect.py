@@ -31,38 +31,43 @@ def RMSStartPoint(data, mask):
 
 
     threshold_start = 250
-    threshold_end = 250
+    threshold_end = 200
     getStart = False
-
     rms = rms_function(data, mask)
 
     data = np.array(data)
     mask = float(mask)
-
-    ##plot and mark start and stop
     plt.figure(1)
     plt.plot(data)
-    plt.title('Raw Data && RMS Line && Start Point', fontsize=15, color='Black')
     plt.plot(rms, '--')
+    plt.title('Raw Data && RMS Line && Start Point', fontsize=15, color='Black')
+
+
     # plt.figure(data)
     # plt.show()
     # Threshold setting start
     start = 0
     for index in range(len(data)):
-        if rms[index] >= threshold_start and getStart == False:
-            plt.plot(index, rms[index], marker="o", color="black")
+        if rms[index] < threshold_start and getStart == False:
+            start = start + 1
+        else:
             getStart = True
-
-        elif rms[index] <= threshold_end and getStart == True:
-            plt.plot(index, rms[index], marker="o", color="RED")
-            getStart = False
-
+            break
+    # Threshold setting end
+    end = start
+    for index in range(start, len(data)):
+        if rms[index] > threshold_end:
+            end = end + 1
+        else:
+            break
 
     ##duration times
     # timer_start = float(start) / 2000
     # timer_end = float(end)/2000
     # duration = timer_end - timer_start
     # print(start) # startPointIndex
+    plt.plot(start, rms[start], marker="o", color="black")
+    plt.plot(end, rms[end], marker="o", color="RED")
     # plt.hlines(rms[start], start-1000, start, colors="r", linestyles='solid')
     # plt.text(end, rms[end] + 600, "start point time = " + str(round(timer_start, 4)) + "(s)")
     # plt.text(end, rms[end] + 400, "end point time = " + str(round(timer_end, 4)) + "(s)")
